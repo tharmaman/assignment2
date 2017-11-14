@@ -17,8 +17,12 @@ library("ggplot2")
 #Using a histogram for the continuous variable (pct_raised)
 ggplot(crowd_data,aes(pct_raised)) + geom_histogram(binwidth = .05, fill="#FF9999", colour="black") + xlim(0, 2) + xlab("Percentage Raised") + ylab("Frequency") + ggtitle("Percentage Raised Histogram") + theme(plot.title = element_text(hjust = 0.5))
 
-#Using a bar plot for the discrete variable (success)
-ggplot(crowd_data, aes(x = success)) + geom_bar(aes(y = (..count..)/sum(..count..))) + scale_y_continuous(formatter = 'percent')
+#Using a bar plot for the dichotomous variable (success)
 
+#Reformatting to show percentages & yes/no instead of count and 0/1
+crowd_data2 <- crowd_data
 
+crowd_data2$success2 <- ifelse(crowd_data2$success==1, "Yes", "No")
+crowd_data2$percentage_success <- crowd_data2$success / sum(crowd_data2$success)
 
+ggplot(crowd_data2, aes(x = success2)) + geom_bar(aes (y = (..count..)/sum(..count..)),fill="#890C3C") + scale_y_continuous(labels=scales::percent) + xlab("Success?") + ylab("Percentage") + ggtitle("Success Proportions") + theme(plot.title = element_text(hjust = 0.5))
