@@ -109,7 +109,7 @@ crowd_data_mlr.train = crowd_data_mlr.train[,-c(6,7)]
 outlierTest(reg1)
 
 # Removing outliers (1286, 7075, 6148, 5782)
-crowd_data_mlr = crowd_data_mlr[-c(1286,7075,6148,5782),]
+crowd_data_mlr.train = crowd_data_mlr.train[-c(1286,7075,6148,5782),]
 
 # Running second regression after removing outliers and multicolinear variables
 reg2 = lm(pct_raised.log ~., data = crowd_data_mlr.train)
