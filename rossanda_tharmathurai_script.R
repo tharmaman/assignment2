@@ -14,6 +14,8 @@ library("ggplot2")
 # total_visitors, start_month, end_month, prior campaigns, 
 # number of perks
 
+# QUESTION 1
+
 #Using a histogram for the continuous variable (pct_raised)
 ggplot(crowd_data,aes(pct_raised)) + geom_histogram(binwidth = .05, fill="#FF9999", colour="black") + xlim(0, 2) + xlab("Percentage Raised") + ylab("Frequency") + ggtitle("Percentage Raised Histogram") + theme(plot.title = element_text(hjust = 0.5))
 
@@ -61,7 +63,42 @@ crowd_data$factor_state_vector = as.numeric(factor_state_vector)
 
 ggplot(crowd_data,aes(x = num_perks, y = pct_raised.log)) + geom_point(color = "blue") + geom_smooth(method = "lm", color = "red") + scale_y_continuous(labels=scales::percent, limits = c(0,3)) + xlab("Number of Perks") + ylab("Percentage Raised") + ggtitle("Percentage Raised vs. Number of Perks") + theme(plot.title = element_text(hjust = 0.5))
 
-#Question 3
+# QUESTION 2
+
+# Prepping data for MLR
+
+# dependent variables: 
+# pct_raised (continuous variable) 
+
+# predictor variables:
+# category, city, state, goal, fb_total_likes,
+# total_visitors, start_month, end_month, prior campaigns, 
+# number of perks
+
+# creating new data frame for MLR analysis
+
+crowd_data_mlr = crowd_data[,c(19,20,21,22,6,8,12,13,15,17,18)]
+
+# Splitting data set
+library(caTools)
+set.seed(123)
+sample=sample.split(crowd_data_mlr, SplitRatio = .60)
+crowd_data_mlr.train<-subset(crowd_data_mlr, sample == TRUE)
+crowd_data_mlr.test<-subset(crowd_data_mlr, sample == FALSE)
+rownames(crowd_data_mlr.train)<-1:7328
+rownames(crowd_data_mlr.test)<-1:6106
+
+# Running correlation for all variables
+cor(crowd_data_mlr)
+
+# Running first regression for all variables
+reg1= lm(pct_raised.log ~., data= crowd_data_mlr)
+summary(reg1)
+
+# Checking for variables with multicolinearity
+
+
+# QUESTION 3
 
 crowd_data <- read_xlsx("~/Downloads/Crowdfunding_data.xlsx")
 crowd_data <- crowd_data[,c("success","state","goal","fb_total_likes","category","unique_visitors","start_month","end_month","prior_campaigns","num_perks")]
