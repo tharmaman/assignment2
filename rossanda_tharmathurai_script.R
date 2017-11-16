@@ -61,7 +61,7 @@ crowd_data$factor_state_vector = as.numeric(factor_state_vector)
 
 #Scatter plot: average_pct_raised vs. number of perks
 
-ggplot(crowd_data,aes(x = num_perks, y = pct_raised.log)) + geom_point(color = "blue") + geom_smooth(method = "lm", color = "red") + scale_y_continuous(labels=scales::percent, limits = c(0,3)) + xlab("Number of Perks") + ylab("Percentage Raised") + ggtitle("Percentage Raised vs. Number of Perks") + theme(plot.title = element_text(hjust = 0.5))
+ggplot(crowd_data,aes(x = num_perks, y = pct_raised.log)) + geom_point(color = "blue") + geom_smooth(method = "lm", color = "red") + scale_y_continuous(labels=scales::percent, limits = c(0,3)) + xlim(0,30) + xlab("Number of Perks") + ylab("Percentage Raised") + ggtitle("Percentage Raised vs. Number of Perks") + theme(plot.title = element_text(hjust = 0.5))
 
 # QUESTION 2
 
