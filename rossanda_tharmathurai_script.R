@@ -66,7 +66,6 @@ ggplot(crowd_data,aes(x = num_perks, y = pct_raised.log)) + geom_point(color = "
 # QUESTION 2
 
 # Prepping data for MLR
-
 # dependent variables: 
 # pct_raised (continuous variable) 
 
@@ -75,7 +74,7 @@ ggplot(crowd_data,aes(x = num_perks, y = pct_raised.log)) + geom_point(color = "
 # total_visitors, start_month, end_month, prior campaigns, 
 # number of perks
 
-# creating new data frame for MLR analysis
+# Creating new data frame for MLR analysis
 
 crowd_data_mlr = crowd_data[,c(19,20,21,22,6,8,12,13,15,17,18)]
 
@@ -92,16 +91,64 @@ rownames(crowd_data_mlr.test)<-1:6106
 cor(crowd_data_mlr)
 
 # Running first regression for all variables
-reg1= lm(pct_raised.log ~., data= crowd_data_mlr)
+reg1 = lm(pct_raised.log ~., data = crowd_data_mlr.train)
 summary(reg1)
 
-# Checking for variables with multicolinearity
+# Initiating outlier test package
+
+install.packages("car")
+library("car")
+
+# Checking for variables with multicolinearity (>5)
+vif(reg1)
+
+# Eliminating fb_total_likes (7.622236) & unique_visitors (7.623186)
+crowd_data_mlr.train = crowd_data_mlr.train[,-c(6,7)]
+
+# Checking for outliers
+outlierTest(reg1)
+
+# Removing outliers (1286, 7075, 6148, 5782)
+crowd_data_mlr = crowd_data_mlr[-c(1286,7075,6148,5782),]
+
+# Running second regression after removing outliers and multicolinear variables
+reg2 = lm(pct_raised.log ~., data = crowd_data_mlr.train)
+summary(reg2) 
+
+# Removing insignificant predictors (factor_city_vector, start_month)
+crowd_data_mlr.train = crowd_data_mlr.train[,-c(3,6)]
+
+# Running third regression after removing insignificant predictors
+reg3 = lm(pct_raised.log ~., data = crowd_data_mlr.train)
+summary(reg3) 
+
+# Using reg3 model to predict validation data
+test1 <- predict(reg3, crowd_data_mlr.test)
+summary(test1)
+
+# Checking reg3 model performance with RMSE
+rmse.test1 <- sqrt(mean((test1 - crowd_data_mlr.test$pct_raised.log)^2, na.rm = TRUE))
+summary(rmse.test1)
+
+# Using reg2 model to predict validation data
+test2 <- predict(reg2, crowd_data_mlr.test)
+summary(test2)
+
+# Checking reg2 model performance with RMSE
+rmse.test2 <- sqrt(mean((test2 - crowd_data_mlr.test$pct_raised.log)^2, na.rm = TRUE))
+summary(rmse.test2)
+
+# Comparing test1 with test2
+rmse.test1
+summary(test1)
+rmse.test2
+summary(test2)
+
+# Test1 using reg3 has a smaller RMSE than test2 using reg2
+# Therefore, reg3 is the better model at predicting
 
 
 # QUESTION 3
-
-crowd_data <- read_xlsx("~/Downloads/Crowdfunding_data.xlsx")
-crowd_data <- crowd_data[,c("success","state","goal","fb_total_likes","category","unique_visitors","start_month","end_month","prior_campaigns","num_perks")]
 
 crowd_data$state <-as.factor(crowd_data$state)
 crowd_data$category <-as.factor(crowd_data$category)
